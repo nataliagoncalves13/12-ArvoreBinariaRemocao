@@ -31,6 +31,8 @@ void exibirElementosArvore(NO* no);
 void buscarElementoArvore(NO* no, int valor);
 NO* buscarElementoArvoreComPai(NO* no, int valor, NO*& pai);
 void removerElementoArvore(NO* no, int valor);
+void ApagaRaiz();
+void ProcuraDeleta(NO* no,int num,NO* anterior);
 //--------------------------
 
 
@@ -83,7 +85,7 @@ void menu()
 void inicializar()
 {
 
-	// provisÛrio porque n„o libera a memoria usada pela arvore
+	// provis√≥rio porque n√£o libera a memoria usada pela arvore
 	raiz = NULL;
 
 	cout << "Arvore inicializada \n";
@@ -127,8 +129,17 @@ void remover() {
 	int valor;
 	cout << "Digite o elemento: ";
 	cin >> valor;
-
-	removerElementoArvore(raiz, valor);
+	if(raiz == NULL){
+            cout<< "√Årvore vazia.";
+        }
+        else
+	{
+            if(valor == raiz->valor){
+                ApagaRaiz();
+            }
+            else{
+                ProcuraDeleta(raiz,valor,NULL);
+            }
 }
 
 
@@ -236,52 +247,73 @@ NO* buscarElementoArvoreComPai(NO* no, int valor, NO*& pai)
 	return NULL;
 }
 
-
-
-void removerElementoArvore(NO* no, int valor) {
-	NO* pai = NULL;
-	NO* atual = buscarElementoArvoreComPai(no, valor, pai);
-	if (atual == NULL) {
-		cout << "Elemento nao encontrado \n";
-		return;
-	}
-
-
-	// caso 1: sem filhos	
-	
-
-	// caso 2: um filho	
-	
-
-	// caso 3: dois filhos
-
-	// procura o elmento mais a esquerda da sub-arvore da direita
-	NO* sucessor = atual->dir;
-	NO* paiSucessor = atual;
-	while (sucessor->esq != NULL) {
-		paiSucessor = sucessor;
-		sucessor = sucessor->esq;
-	}
-
-	// copia o valor do sucessor para o no atual
-	atual->valor = sucessor->valor;
-
-	// se existir uma sub-arvore a direita do sucessor , entao
-	// ela deve ser ligada ao pai do sucessor
-	if (sucessor->dir != NULL)
-	{
-		paiSucessor->esq = sucessor->dir;
-	}
-	else {
-		paiSucessor->esq = NULL;
-	}
-
-	//libera memoria
-	free(sucessor);
-
-
+void ProcuraDeleta(NO* no,int num,NO* anterior){
+    if(no==NULL){
+        cout<<"Valor nao encontrado.";
+        return;
+    }
+    if(no->valor==num){
+        NO* paraexcluir = no;
+        if(no->dir!=NULL){
+            if(no->esq!=NULL){
+                NO* PontaSolta = no->dir;
+                while(PontaSolta->esq!=NULL){
+                    PontaSolta = PontaSolta->esq;
+                }
+                PontaSolta->esq=no->esq;
+            }
+            if(no->dir->valor>anterior->valor){
+                anterior->dir=no->dir;
+            }
+            else{
+                anterior->esq=no->dir;
+            }
+        }
+        else{
+            if(no->esq!=NULL){
+                if(no->esq->valor<anterior->valor){
+                    anterior->esq=no->esq;
+                }
+                else{
+                    anterior->dir=no->esq;
+                }
+            }
+            else{
+                if(no->valor>anterior->valor){anterior->dir=NULL;}
+                else{anterior->esq=NULL;}
+            }
+        }
+        cout<<"Valor deletado";
+        free(paraexcluir);
+        return;
+    }
+    if(num>no->valor){ProcuraDeleta(no->dir,num,no);}
+    else{ ProcuraDeleta(no->esq,num,no); }
 }
 
+void ApagaRaiz(){
+    NO* paraexcluir = raiz;
+    if(raiz->dir!=NULL){
+        if(raiz->esq!=NULL){
+            NO* PontaSolta = raiz->dir;
+            while(PontaSolta->esq!=NULL){
+                PontaSolta=PontaSolta->esq;
+            }
+            PontaSolta->esq=raiz->esq;
+        }
+        raiz=raiz->dir;
+    }
+    else{
+        if(raiz->esq!=NULL){
+            raiz=raiz->esq;
+        }
+        else{
+            raiz=NULL;
+        }
+    }
+    free(paraexcluir);
+    cout<<"Valor deletado\n";
+}
 
 
 
